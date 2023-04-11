@@ -17,6 +17,11 @@
 	<modules>
 		<module>../picapport-heic-plugin</module>
 	</modules>
+	
+	<scm>
+		<connection>scm:git:https://github.com/giamma/picapport-heic-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:giamma/picapport-heic-plugin.git</developerConnection>
+	</scm>
 
 	<build>
 		<plugins>

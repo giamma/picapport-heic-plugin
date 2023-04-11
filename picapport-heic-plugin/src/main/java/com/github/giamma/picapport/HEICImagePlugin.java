@@ -20,14 +20,12 @@ package com.github.giamma.picapport;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
@@ -50,8 +48,15 @@ import de.contecon.picapport.plugins.otherformats.OtherFormatsDescriptor;
  * @author giamma
  */
 public class HEICImagePlugin implements IOtherFileFormat {
+	private static final String VERSION_PROPERTY = "version";
+	private static final String COPYRIGHT = "(c) 2023 Gianmaria Romanato";
+	private static final String HEIF_MIME_TYPE = "image/heif";
+	private static final String HEIC_MIME_TYPE = "image/heic";
+	private static final String HEIF_FILE_EXTENSION = ".heif";
+	private static final String HEIC_FILE_EXTENSION = ".heic";
+	private static final String INTERNAL_PROPERTIES = "/version.properties";
 	private static final String IMAGEMAGICK_EXECUTABLE = "convert";
-	public static final String PLUGIN_NAME = "PicApport HEIC Plugin";
+	public static final String PLUGIN_NAME = "picapport-heic-plugin";
 	private IPicApportPlugInLogger logger;
 
 	@Override
@@ -59,37 +64,33 @@ public class HEICImagePlugin implements IOtherFileFormat {
 		this.logger = logger;
 
 		String version = getVersion();
-		logger.logDebugMessage("Version: "+version);
-		
+		if (version != null) {
+			logger.logDebugMessage("version: " + version);
+		}
+
 		try {
 			Runtime.getRuntime().exec(IMAGEMAGICK_EXECUTABLE);
 		} catch (IOException e) {
-			logger.logErrorMessage("Cannot find 'convert' executable, make sure ImageMagick is installed and included in PATH");
+			logger.logErrorMessage(
+					"Cannot find 'convert' executable, make sure ImageMagick is installed and included in PATH");
 		}
-		
+
 		return Arrays.asList(new OtherFormatsDescriptor[] {
-				new OtherFormatsDescriptor(".heic", "image/heic", true, PLUGIN_NAME, "(c) 2023 Gianmaria Romanato",
+				new OtherFormatsDescriptor(HEIC_FILE_EXTENSION, HEIC_MIME_TYPE, true, PLUGIN_NAME, COPYRIGHT,
 						version, props),
-				new OtherFormatsDescriptor(".heif", "image/heif", true, PLUGIN_NAME, "(c) 2023 Gianmaria Romanato",
+				new OtherFormatsDescriptor(HEIF_FILE_EXTENSION, HEIF_MIME_TYPE, true, PLUGIN_NAME, COPYRIGHT,
 						version, props) });
+	}
+
+	private String getVersion() {
+		try (InputStream is = getClass().getResourceAsStream(INTERNAL_PROPERTIES)) {
+			Properties p = new Properties();
+			p.load(is);
+			return p.getProperty(VERSION_PROPERTY);
+		} catch (Exception e) {
+			return null;
 		}
-	
-		private String getVersion() {
-			String version = null;
-			try {
-				ClassLoader cl = getClass().getClassLoader();
-				URL url = cl.getResource("META-INF/MANIFEST.MF");
-				Manifest manifest = new Manifest(url.openStream());
-				Attributes attr = manifest.getMainAttributes();
-				version = attr.getValue("Implementation-Version");
-			} catch (Exception e) {
-			}
-			if (version == null) {
-				return "1.0.0";
-			} else {
-				return version;
-			}
-		}
+	}
 
 	@Override
 	public CcXMPMetaData createJpegFile(File otherFormatFile, File jpegFileToCreate, CcXMPMetaData metaDataIn)
