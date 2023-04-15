@@ -16,7 +16,10 @@ For those running Piccapport via whatever4711 docker [image](https://hub.docker.
 # credits
 This project uses:
 - [ImageMagick](https://imagemagick.org/index.php) for converting HEIC/HEIF pictures to JPEG
-- [im4j](https://im014java.sourceforge.net/) to invoke ImageMagick. This library did not see a release for many years, but it still works perfectly.
+- [im4java](https://im4java.sourceforge.net/) to invoke ImageMagick. This library did not see a release for many years, but it still works perfectly.
 
 # license
 This project is licensed under the Apache Public License 2.0.
+
+# Frequently Asked Questions
+See [here](https://github.com/giamma/picapport-heic-plugin/wiki/Frequently-Asked-Questions).
